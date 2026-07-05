@@ -13,6 +13,7 @@ st.header("➕ Neue Buchung anlegen")
 with st.form("buchungs_formular", clear_on_submit=True):
     eingabe_datum = st.date_input("Buchungsdatum", date.today())
     eingabe_betrag = st.number_input("Betrag (in €)", min_value=0.01, step=0.01, format="%.2f")
+    eingabe_name = st.text_input("Name")
     eingabe_kategorie = st.text_input("Kategorie / Konto (z.B. Miete, Büromaterial)")
     eingabe_typ = st.selectbox("Buchungstyp", ["expense", "income"], format_func=lambda x: "Ausgabe" if x == "expense" else "Einnahme")
     eingabe_beschreibung = st.text_area("Beschreibung")
@@ -23,6 +24,7 @@ if abschicken:
     daten_paket = {
         "datum": str(eingabe_datum),
         "betrag": eingabe_betrag,
+        "name": eingabe_name,
         "kategorie": eingabe_kategorie,
         "buchungstyp": eingabe_typ,
         "beschreibung": eingabe_beschreibung
@@ -70,8 +72,11 @@ try:
             st.bar_chart(chart_data)
             
             st.subheader("📋 Einzelbuchungen")
-            # Für neuere Streamlit-Versionen angepasst
-            st.dataframe(df[["id", "datum", "betrag", "kategorie", "buchungstyp", "beschreibung"]], width="stretch")
+
+            st.write("Vorhandene Spalten:", df.columns.tolist()) # debugge 
+            vorhandene_spalten = [c for c in ["id", "betrag", "name", "kategorie", "buchungstyp", "beschreibung"] if c in df.columns]
+
+            st.dataframe(df[vorhandene_spalten], width="stretch")
         else:
             st.info("Noch keine Buchungen in der Datenbank vorhanden.")
     else:
