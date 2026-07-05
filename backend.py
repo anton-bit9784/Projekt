@@ -5,6 +5,7 @@ import sqlite3
 
 app = FastAPI()
 
+# 1. Definiert Datenstruktur
 class BuchungStruktur(BaseModel):
     datum: date                
     betrag: float              
@@ -12,12 +13,20 @@ class BuchungStruktur(BaseModel):
     buchungstyp: str           
     beschreibung: str
 
+# 2. VErbindung zu SQLite-Datenbank
+def get_db_connection():
+    """Erstellt eine saubere Verbindung zur SQLite-Datenbank."""
+    verbindung = sqlite3.connect("datenbank.db")
+    verbindung.row_factory = sqlite3.Row  # Erlaubt Zugriff via Spaltennamen
+    return verbindung
+
+
 @app.post("/buchung-erstellen")
 def erstelle_buchung(neue_buchung: BuchungStruktur):
-    verbindung = sqlite3.connect("datenbank.db")
+    verbindung = get_db_connection()
     zeiger = verbindung.cursor()
 
-    # Tabelle sicherheitshalber erstellen, falls sie noch nicht existiert
+    # Tabelle erstellen, falls nicht vorhanden
     zeiger.execute("""
     CREATE TABLE IF NOT EXISTS buchungssystem (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,6 +38,7 @@ def erstelle_buchung(neue_buchung: BuchungStruktur):
     )
     """)
 
+    # Daten sicher einfuegen 
     zeiger.execute(""" 
     INSERT INTO buchungssystem (datum, betrag, kategorie, buchungstyp, beschreibung) 
     VALUES (?, ?, ?, ?, ?)
@@ -46,13 +56,13 @@ def erstelle_buchung(neue_buchung: BuchungStruktur):
     
 @app.get("/buchungen")
 def hole_alle_buchungen():
-    verbindung = sqlite3.connect("datenbank.db")
-    verbindung.row_factory = sqlite3.Row
+    verbindung = get_db_connection()
     zeiger = verbindung.cursor()
 
     try:
         zeiger.execute("SELECT * FROM buchungssystem")
         reihen = zeiger.fetchall()
+        # Wandelt SQL-Reihen in Python-Dicts um
         ergebnis = [dict(reihe) for reihe in reihen]
     except sqlite3.OperationalError:
         ergebnis = [] # Falls Tabelle noch leer/nicht existent ist
