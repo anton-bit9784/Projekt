@@ -7,17 +7,21 @@ import utils
 
 app = FastAPI()
 
+# Erstellung der Tabelle für die Daten
 utils.init_db()
 
+# Speicher neue Buchungen in SQLite-Datenbank / Bestätigung wenn alles klapt 
 @app.post("/buchung-erstellen")
 def erstelle_buchung(neue_buchung: BuchungStruktur):
     utils.speichere_buchung(neue_buchung)
     return {"status": "Erfolgreich in der SQLite - Datenbank gespeichert!"}
-    
+
+# Abfrage der Liste mit allen gespeicherten Daten
 @app.get("/buchungen")
 def hole_buchungen():
     return utils.hole_alle_buchungen()
 
+# Home...
 @app.get("/")
 def home():
     return {"status": "Das SQ-Lite Backend läuft perfekt!"}
