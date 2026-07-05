@@ -71,7 +71,7 @@ try:
             
             st.subheader("📋 Einzelbuchungen")
             # Für neuere Streamlit-Versionen angepasst
-            st.dataframe(df[["id", "datum", "betrag", "kategorie", "buchungstyp", "beschreibung"]], width=None)
+            st.dataframe(df[["id", "datum", "betrag", "kategorie", "buchungstyp", "beschreibung"]], width="stretch")
         else:
             st.info("Noch keine Buchungen in der Datenbank vorhanden.")
     else:
