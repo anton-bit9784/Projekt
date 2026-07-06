@@ -47,8 +47,36 @@ if abschicken:
 
 st.markdown("---")
 
+st.header("📅 Bilanz zu einem Stichtag")
+
+stichtag = st.date_input("Wähle einen Stichtag", date.today())
+
+if st.button("Bilanz berechnen"):
+    antwort = requests.get(f"http://127.0.0.1:8000/buchungen/{stichtag}")
+
+    if antwort.status_code == 200:
+        bilanz_liste = antwort.json()
+
+        if bilanz_liste:
+            df_stichtag = pd.DataFrame(bilanz_liste)
+            einnahmen_stichtag = df_stichtag[df_stichtag["buchungstyp"] == "income"]["betrag"].sum()
+            ausgaben_stichtag = df_stichtag[df_stichtag["buchungstyp"] == "expense"]["betrag"].sum()
+
+            st.write(f"### Bilanz zum {stichtag}")
+            st.metric("Summe Einnahmen", f"{einnahmen_stichtag:,.2f} €")
+            st.metric("Summe Ausgaben", f"{ausgaben_stichtag:,.2f} €")
+            st.metric("Saldo", f"{(einnahmen_stichtag - ausgaben_stichtag):,.2f} €")
+        else:
+            st.info("Keine Buchungen bis zu diesem Datum gefunden.")
+
+    else:
+        st.error("Fehler beim Abrufen der Daten vom Backend.") # Fehler beim anfordern der Daten vom Backend
+
+
+st.markdown("---")
+
 # Unter Überschrift
-st.header("📊 Auswertung & Buchungsübersicht")
+st.header("📊 Auswertung & Buchungsübersicht aller Buchungen")
 
 try:
     antwort = requests.get("http://127.0.0.1:8000/buchungen") # Antowort wird vom Backend angfordert
@@ -57,7 +85,7 @@ try:
         buchungs_liste = antwort.json() # buchungs_liste = Antwort aus dem Backend
         
         if buchungs_liste:
-            df = pd.DataFrame(buchungs_liste) # Erstellung Tabelle 
+            df = pd.DataFrame(buchungs_liste) # Erstellung Tabelle / Umwandlung in Pandas-Format
             
             # Berechnung der Ergebnisse
             einnahmen = df[df["buchungstyp"] == "income"]["betrag"].sum() # Liste der Einnahmen
@@ -87,7 +115,7 @@ try:
             st.subheader("📋 Einzelbuchungen")
 
             ##st.write("Vorhandene Spalten:", df.columns.tolist()) # debugge Tool ignorrieren 
-            vorhandene_spalten = [c for c in ["id", "betrag", "name", "kategorie", "buchungstyp", "beschreibung"] if c in df.columns] # Lowkey unnötig war wergen bug
+            vorhandene_spalten = [c for c in ["id", "datum", "betrag", "name", "kategorie", "buchungstyp", "beschreibung"] if c in df.columns] # Lowkey unnötig war wergen bug
 
             st.dataframe(df[vorhandene_spalten], width="stretch") # Darstellung alle Buchungen
 

@@ -21,6 +21,11 @@ def erstelle_buchung(neue_buchung: BuchungStruktur):
 def hole_buchungen():
     return utils.hole_alle_buchungen()
 
+# Abfrage Liste der Buchungen zum Stichtag
+@app.get("/buchungen/{stichtag}")
+def hole_buchungen_stichtag(stichtag: str):
+    return utils.hole_buchungen_bis_stichtag(stichtag)
+
 # Home...
 @app.get("/")
 def home():

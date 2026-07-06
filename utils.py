@@ -13,7 +13,7 @@ def init_db():
     zeiger.execute("""
     CREATE TABLE IF NOT EXISTS buchungssystem (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        datum TEXT NOT NULL,
+        datum DATE NOT NULL,
         betrag REAL NOT NULL,
         name TEXT,
         kategorie TEXT NOT NULL,
@@ -54,6 +54,17 @@ def hole_alle_buchungen():
     zeiger.close()
     verbindung.close()
 
+    return ergebnis
+
+def hole_buchungen_bis_stichtag(stichtag: str):
+    verbindung = get_db_connection()
+    zeiger = verbindung.cursor()
+    zeiger.execute("SELECT * FROM buchungssystem WHERE datum <= ?", (stichtag,))
+    reihen = zeiger.fetchall()
+    ergebnis = [dict(reihe) for reihe in reihen]
+
+    zeiger.close()
+    verbindung.close()
     return ergebnis
 
 
