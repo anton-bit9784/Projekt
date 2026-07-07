@@ -20,34 +20,34 @@ if "username" not in st.session_state:
 if not st.session_state["eingeloggt"]:
     st.title("🔐 Login / Registierung")
 
-    tab1, tab2 = st.tabs(["Anmelden", "Konto erstellen"])
+    tab1, tab2 = st.tabs(["Anmelden", "Konto erstellen"]) # Entscheidung anmelden / Konto erstellen (oben)
 
     with tab1:
-        st.subheader("Login")
+        st.subheader("Login") 
         login_user = st.text_input("Benutzername", key = "login_user")
-        login_passwort = st.text_input("Passwort", type = "password", key = "login_passwort")
+        login_passwort = st.text_input("Passwort", type = "password", key = "login_passwort") # Eingabe feld für User/Password type damit so versteckt ist
 
         if st.button("Einloggen"): 
             try:
-                antwort = requests.post(f"{BACKEND_URL}/login", json={"username": login_user, "passwort": login_passwort}) 
-                if antwort.status_code == 200:
+                antwort = requests.post(f"{BACKEND_URL}/login", json={"username": login_user, "passwort": login_passwort}) # Alles richtig -> uername / passwort korrekt
+                if antwort.status_code == 200: 
                     st.session_state["eingeloggt"] = True 
                     st.session_state["username"] = login_user
                     st.rerun() # Lädt Seite neu um Dashbloard anzuzeigen
                 else:
-                    st.error("❌ " + antwort.json().get("detail", "Login fehlgeschlagen."))
+                    st.error("❌ " + antwort.json().get("detail", "Login fehlgeschlagen.")) 
             except requests.exceptions.ConnectionError:
                 st.error("❌ Das Backend läuft scheinbar nicht. Bitte starte zuerst backend.py!")
 
     with tab2:
         st.subheader("Registrierung")
         reg_user = st.text_input("Benutzername", key = "reg_user")
-        reg_passwort = st.text_input("Passwort", type = "password", key = "reg_passwort")
+        reg_passwort = st.text_input("Passwort", type = "password", key = "reg_passwort") # Eingabe für neue Account
 
         if st.button("Konto erstellen"):
-            if reg_user and reg_passwort:
+            if reg_user and reg_passwort: # Kontrolle ob beides ausgefühlt
                 try:
-                    antwort = requests.post(f"{BACKEND_URL}/registrierung", json = {"username": reg_user, "passwort": reg_passwort})
+                    antwort = requests.post(f"{BACKEND_URL}/registrierung", json = {"username": reg_user, "passwort": reg_passwort}) # Alles richtig -> neue Username + ausgefühltes passwort
                     if antwort.status_code == 200:
                         st.success("🎉 Konto erfolgreich erstellt! Du kannst dich jetzt anmelden.")
                     else:
@@ -84,8 +84,8 @@ else:
         eingabe_beschreibung = st.text_area("Beschreibung")
     
         abschicken = st.form_submit_button("Buchung speichern")
-    # Wenn abgeschickt wird erstellung eines Datenpackets (Buchung)
-    if abschicken:
+    
+    if abschicken: # Wenn abgeschickt wird erstellung eines Datenpackets (Buchung)
         daten_paket = {
             "datum": str(eingabe_datum),
             "betrag": eingabe_betrag,
@@ -113,28 +113,28 @@ else:
     heute = date.today()
     ein_jahr_zurueck = heute - timedelta(days=365)
 
-    stichtag = st.date_input(
+    stichtag = st.date_input( # Wahl des Stichtag idk logisch halt
         "Wähle einen Stichtag (max. 1 Jahr zurück)", 
         value = heute,
         min_value = ein_jahr_zurueck,
         max_value = heute
     )
 
-    if st.button("Bilanz berechnen"):
-        antwort = requests.get(f"{BACKEND_URL}/buchungen/stichtag/{stichtag}?username={current_user}")
+    if st.button("Bilanz berechnen"): 
+        antwort = requests.get(f"{BACKEND_URL}/buchungen/stichtag/{stichtag}?username={current_user}") # So wie immer Kontakt zu backend
 
-        if antwort.status_code == 200:
+        if antwort.status_code == 200: # Erfolgreiche Antwort
             bilanz_liste = antwort.json()
 
             if bilanz_liste:
                 df_stichtag = pd.DataFrame(bilanz_liste)
                 einnahmen_stichtag = df_stichtag[df_stichtag["buchungstyp"] == "income"]["betrag"].sum()
-                ausgaben_stichtag = df_stichtag[df_stichtag["buchungstyp"] == "expense"]["betrag"].sum()
+                ausgaben_stichtag = df_stichtag[df_stichtag["buchungstyp"] == "expense"]["betrag"].sum() # Berechnung der einnahmen / ausgaben
 
-                st.write(f"### Bilanz zum {stichtag}")
+                st.write(f"### Bilanz zum {stichtag}")  
                 st.metric("Summe Einnahmen", f"{einnahmen_stichtag:,.2f} €")
                 st.metric("Summe Ausgaben", f"{ausgaben_stichtag:,.2f} €")
-                st.metric("Saldo", f"{(einnahmen_stichtag - ausgaben_stichtag):,.2f} €")
+                st.metric("Saldo", f"{(einnahmen_stichtag - ausgaben_stichtag):,.2f} €") # Anzeige der Bilanz
             else:
                 st.info("Keine Buchungen im Zeitraum der letzten 12 Monate bis zum gewählten Stichtag gefunden.")
 

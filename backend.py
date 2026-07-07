@@ -26,7 +26,7 @@ def login(user: UserStruktur):
         raise HTTPException(status_code = 401, detail = "Falscher Benutzername oder Passwort.")
     return {"status": "Login erfolgreich!"}
 
-# Speicher neue Buchungen in SQLite-Datenbank / Bestätigung wenn alles klapt 
+# Speicher neue Buchungen in Datenbank / Bestätigung wenn alles klapt 
 @app.post("/buchung-erstellen")
 def erstelle_buchung(neue_buchung: BuchungStruktur, username: str):
     utils.speichere_buchung(neue_buchung, username)

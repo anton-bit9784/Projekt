@@ -45,6 +45,7 @@ def init_db():
     zeiger.close()
     verbindung.close()
 
+# Speichert neue Benutzer in Datenbank
 def erstelle_benutzer(username, passwort):
     verbindung = get_db_connection()
     zeiger = verbindung.cursor()
@@ -64,6 +65,7 @@ def erstelle_benutzer(username, passwort):
 
     return erfolg
 
+# Schaut ob username und passwort mit einem beriets existierenden user übereinstimmt
 def ueberpruefe_benutzer(username, passwort):
     verbindung = get_db_connection()
     zeiger = verbindung.cursor()
@@ -106,7 +108,7 @@ def hole_alle_buchungen(username):
 
     return ergebnis
 
-# # Holt alle Buchungen welche zur Zeitspanne passen vom user aus der Datenbank bzw. lädt die Daten zurück ins Frontend
+# Holt alle Buchungen welche zur Zeitspanne passen vom user aus der Datenbank bzw. lädt die Daten zurück ins Frontend
 def hole_buchungen_bis_stichtag(stichtag_str: str, username: str):
 
     stichtag = datetime.strptime(stichtag_str, "%Y-%m-%d").date() 
