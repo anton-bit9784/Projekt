@@ -1,7 +1,5 @@
-from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import date
-import sqlite3
 
 # Definiert Datenstruktur der Buchungen
 class BuchungStruktur(BaseModel):
@@ -11,3 +9,8 @@ class BuchungStruktur(BaseModel):
     kategorie: str             
     buchungstyp: str           
     beschreibung: str
+
+# Definiert Datenstruktur für User
+class UserStruktur(BaseModel):
+    username: str
+    passwort: str 
